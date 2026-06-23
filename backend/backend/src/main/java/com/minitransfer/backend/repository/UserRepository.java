@@ -1,6 +1,6 @@
 package com.minitransfer.backend.repository;
 
-import com.minitransfer.model.User;
+import com.minitransfer.backend.model.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
