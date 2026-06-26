@@ -17,22 +17,12 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public AuthResponse register(
-            @RequestBody RegisterRequest request
-    ) {
-
-        String token = authService.register(request);
-
-        return new AuthResponse(token);
+    public AuthResponse register(@RequestBody RegisterRequest request) {
+        return authService.register(request);
     }
 
     @PostMapping("/login")
-    public AuthResponse login(
-            @RequestBody LoginRequest request
-    ) {
-
-        String token = authService.login(request);
-
-        return new AuthResponse(token);
+    public AuthResponse login(@RequestBody LoginRequest request) {
+        return authService.login(request);
     }
 }

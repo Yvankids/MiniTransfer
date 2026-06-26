@@ -1,6 +1,6 @@
 package com.minitransfer.backend.service;
 
-
+import com.minitransfer.backend.dto.AuthResponse;
 import com.minitransfer.backend.dto.LoginRequest;
 import com.minitransfer.backend.dto.RegisterRequest;
 import com.minitransfer.backend.model.User;
@@ -18,7 +18,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    public String register(RegisterRequest request) {
+    public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("Email already exists");
@@ -32,26 +32,28 @@ public class AuthService {
                 .balance(10000L)
                 .build();
 
-        userRepository.save(user);
+        User saved = userRepository.save(user);
+        String token = jwtService.generateToken(saved.getEmail());
 
-        return jwtService.generateToken(user.getEmail());
+        return new AuthResponse(token, saved.getId(), saved.getEmail());
     }
 
-    public String login(LoginRequest request) {
+    public AuthResponse login(LoginRequest request) {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
-        boolean validPassword =
-                passwordEncoder.matches(
-                        request.getPassword(),
-                        user.getPassword()
-                );
+        boolean validPassword = passwordEncoder.matches(
+                request.getPassword(),
+                user.getPassword()
+        );
 
         if (!validPassword) {
             throw new RuntimeException("Invalid credentials");
         }
 
-        return jwtService.generateToken(user.getEmail());
+        String token = jwtService.generateToken(user.getEmail());
+
+        return new AuthResponse(token, user.getId(), user.getEmail());
     }
 }
