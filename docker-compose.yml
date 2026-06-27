@@ -11,7 +11,7 @@ services:
     restart: unless-stopped
 
   backend:
-    build: ./backend
+    build: ./backend/backend
     container_name: minitransfer-backend
     ports:
       - "8080:8080"
