@@ -1,0 +1,16 @@
+build
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.dart_tool
+.idea
+.vscode
+**/ios/Pods
+**/android/.gradle
+**/build
+**/target
+**/.dart_tool
+**/.packages
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/pubspec.lock

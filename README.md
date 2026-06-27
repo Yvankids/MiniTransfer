@@ -117,17 +117,19 @@ docker-compose up --build
 ```
 
 This composes:
-- MongoDB on port `27017`
+- MongoDB on port `27017` (host port `27018` if `27017` is already taken)
 - Spring Boot API on port `8080`
+- Flutter web preview on port `8081`
 
 Files added for Docker support:
 - `docker-compose.yml` — compose definition at the repo root
-- `backend/Dockerfile` — builds the backend image
+- `backend/backend/Dockerfile` — builds the backend image
+- `mobile/Dockerfile` — builds a Flutter web preview image
 - `.env.example` — sample environment variables for local development
 
 The backend service reads MongoDB configuration from environment variables and uses the default database `minitransfer`.
 To use the sample environment file, copy `.env.example` to `.env` before running Docker.
-The Flutter mobile app is not containerized, so continue running it locally with `flutter run`.
+The Flutter mobile app can now be previewed as a web build using the `mobile-web` service on `http://localhost:8081`.
 
 To stop the containers:
 ```bash

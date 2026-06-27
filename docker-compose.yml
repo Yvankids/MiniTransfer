@@ -23,5 +23,14 @@ services:
       - JWT_EXPIRATION=86400000
     restart: unless-stopped
 
+  mobile-web:
+    build: ./mobile
+    container_name: minitransfer-mobile-web
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
 volumes:
   mongo-data:

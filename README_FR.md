@@ -116,17 +116,19 @@ docker-compose up --build
 ```
 
 Cela démarre :
-- MongoDB sur le port `27017`
+- MongoDB sur le port `27017` (port hôte `27018` si `27017` est déjà utilisé localement)
 - API Spring Boot sur le port `8080`
+- Aperçu Flutter web sur le port `8081`
 
 Fichiers ajoutés pour le support Docker :
 - `docker-compose.yml` — définition compose à la racine du dépôt
-- `backend/Dockerfile` — Dockerfile pour construire l'image backend
+- `backend/backend/Dockerfile` — Dockerfile pour construire l'image backend
+- `mobile/Dockerfile` — Dockerfile pour construire l'aperçu Flutter web
 - `.env.example` — exemple de variables d'environnement pour le développement local
 
 Le service backend lit la configuration MongoDB depuis des variables d'environnement et utilise la base par défaut `minitransfer`.
 Pour utiliser l'exemple de fichier d'environnement, copiez `.env.example` en `.env` avant d'exécuter Docker.
-L'application Flutter n'est pas conteneurisée ; exécutez-la localement avec `flutter run`.
+L'application Flutter peut maintenant être aperçue en version web via le service `mobile-web` sur `http://localhost:8081`.
 
 Pour arrêter les conteneurs :
 ```bash
