@@ -6,16 +6,37 @@ MiniTransfer allows users to register, log in, check their wallet balance, send 
 
 ---
 
+## Project Focus
+
+This project is intentionally scoped to deliver a complete, high-quality mobile + backend experience with a limited feature set. It emphasizes:
+- a clean, maintainable architecture for the Flutter client and Spring Boot API,
+- a working NoSQL data model with MongoDB and atomic balance updates,
+- documented build and run steps including Docker support,
+- a Postman collection for API validation,
+- personal and original implementation without overly broad or unfinished features.
+
+The result is a focused technical test submission where quality and correctness are prioritized over feature volume.
+
+---
+
 ## Technical Choices
 
 ### State Management — Flutter
 ValueNotifier and ValueListenableBuilder were used for state management. This approach provides a lightweight, reactive way to handle global states like Theme and Language without the overhead of external libraries.
 
 ### MongoDB Modelling
-The balance is stored directly inside the `users` document (no separate `wallets` collection). This keeps reads simple — fetching a user's balance requires a single document lookup. Balance updates are performed using MongoDB's atomic `$inc` operator via `MongoTemplate` to prevent race conditions and ensure no money is created or lost during concurrent transfers.
+Balance modelling choice — stored inside the `users` document
 
-Two collections are used:
-- `users` — stores name, email, phone, hashed password, and balance (in FCFA as a `Long`)
+For this technical test the balance is kept as a field on the `users` document (no separate `wallets` collection). Rationale:
+- Simplicity: reading a user's balance requires a single document lookup which keeps client code and API responses simple.
+- Atomic updates: balance changes are applied with MongoDB's `$inc` operator via `MongoTemplate`, which provides atomic increments and prevents money creation or loss under concurrent updates.
+- Fit-for-purpose: for a small-scale mobile-money test app this avoids the complexity of maintaining a separate wallet collection and additional transactional logic.
+
+Trade-offs:
+- If the system were to scale to many wallets per user, or require complex ledger/audit requirements, a separate `wallets` or ledger collection would be preferable. That design is intentionally out-of-scope for this exercise.
+
+Collections in the project:
+- `users` — stores name, email, phone, hashed password, and `balance` (stored as an integer amount in FCFA)
 - `transactions` — stores sender ID, receiver ID, amount, status, and timestamp
 
 ### Currency
@@ -76,7 +97,11 @@ This composes:
 - MongoDB on port `27017`
 - Spring Boot API on port `8080`
 
-The backend image is built from `backend/backend/Dockerfile`.
+Files added for Docker support:
+- `docker-compose.yml` — compose definition at the repo root
+- `backend/backend/Dockerfile` — builds the backend image
+
+The backend service reads MongoDB configuration from environment variables and uses the default database `minitransfer`.
 The Flutter mobile app is not containerized, so continue running it locally with `flutter run`.
 
 To stop the containers:

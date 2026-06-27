@@ -1,0 +1,31 @@
+{
+  "info": {
+    "name": "MiniTransfer - Transactions",
+    "_postman_id": "5c7d9b3a-0002-4f3a-8f2a-222222222222",
+    "description": "Transactions collection: create transfer and history endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Create Transfer",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Authorization", "value": "Bearer {{auth_token}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{\n  \"senderEmail\": \"jorel@example.com\",\n  \"receiverEmail\": \"alice@example.com\",\n  \"amount\": 2500\n}" },
+        "url": { "raw": "{{base_url}}/api/transfers", "host": ["{{base_url}}"], "path": ["api","transfers"] }
+      }
+    },
+    {
+      "name": "Transfer History",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Authorization", "value": "Bearer {{auth_token}}" } ],
+        "url": { "raw": "{{base_url}}/api/transfers/history", "host": ["{{base_url}}"], "path": ["api","transfers","history"] }
+      }
+    }
+  ],
+  "variable": [ { "key": "base_url", "value": "http://localhost:8080" }, { "key": "auth_token", "value": "" } ]
+}
