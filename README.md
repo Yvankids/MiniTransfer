@@ -134,11 +134,13 @@ To stop the containers:
 docker-compose down
 ```
 
-## Demo vidéo
+## Démo vidéo
 
-Clique sur l’image ci-dessous pour ouvrir la vidéo de démonstration :
+Clique sur l’image ci-dessous pour ouvrir la vidéo de démonstration.
 
-[![Démonstration MiniTransfer](./picture.png)](./20260627-1046-12.2522141.mp4)
+> Note : GitHub ne prévisualise pas toujours les fichiers MP4 volumineux. Si la vidéo ne s’affiche pas, clique sur le lien pour la télécharger ou l’ouvrir.
+
+[<img src="./picture.png" alt="Démonstration MiniTransfer" width="320" style="max-width:100%;border:1px solid #ddd;border-radius:16px;">](./20260627-1046-12.2522141.mp4)
 
 ---
 
