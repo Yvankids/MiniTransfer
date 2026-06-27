@@ -6,16 +6,36 @@ MiniTransfer permet aux utilisateurs de s'inscrire, de se connecter, de consulte
 
 ---
 
+## Focus du projet
+
+Ce projet est volontairement limité en périmètre afin de fournir une expérience mobile + backend complète et de haute qualité. Il met l'accent sur :
+- une architecture propre et maintenable pour le client Flutter et l'API Spring Boot,
+- un modèle NoSQL fonctionnel avec des mises à jour atomiques de solde,
+- une documentation complète et des étapes de build incluant le support Docker,
+- des collections Postman pour valider l'API,
+- une implémentation personnelle et originale sans fonctionnalités inachevées.
+
+Le résultat est une livraison focalisée où la qualité et la correction priment sur le volume fonctionnel.
+
+
 ## Choix Techniques
 
 ### Gestion d'État — Flutter
 `ValueNotifier` et `ValueListenableBuilder` ont été utilisés pour la gestion d'état. Cette approche offre un moyen léger et réactif de gérer les états globaux comme le Thème et la Langue sans la complexité de bibliothèques externes.
 
 ### Modélisation MongoDB
-Le solde est stocké directement dans le document `users` (pas de collection `wallets` séparée). Cela simplifie les lectures — la récupération du solde d'un utilisateur nécessite une seule recherche de document. Les mises à jour du solde sont effectuées à l'aide de l'opérateur atomique `$inc` de MongoDB via `MongoTemplate` pour éviter les conditions de concurrence et garantir qu'aucun argent n'est créé ou perdu lors de transferts simultanés.
+Choix de modélisation — solde dans le document `users`
 
-Deux collections sont utilisées :
-- `users` — stocke le nom, l'email, le téléphone, le mot de passe haché et le solde (en FCFA en tant que `Long`)
+Pour ce test technique, le solde est conservé comme champ du document `users` (pas de collection `wallets` séparée). Raisons :
+- Simplicité : la lecture du solde d'un utilisateur ne nécessite qu'une seule requête de document, ce qui simplifie le code client et les réponses de l'API.
+- Mises à jour atomiques : les changements de solde sont appliqués avec l'opérateur `$inc` de MongoDB via `MongoTemplate`, garantissant des incréments atomiques et évitant la création ou la perte d'argent lors d'opérations concurrentes.
+- Adapté au besoin : pour une application de test à petite échelle, cela évite la complexité d'une collection `wallets` séparée et la logique transactionnelle associée.
+
+Compromis :
+- Si l'application devait évoluer vers plusieurs portefeuilles par utilisateur ou exiger un registre comptable détaillé, une collection `wallets` ou un ledger serait préférable. Ce choix est volontairement hors-scope pour cet exercice.
+
+Collections du projet :
+- `users` — stocke le nom, l'email, le téléphone, le mot de passe haché et `balance` (stocké en entier, montant en FCFA)
 - `transactions` — stocke l'ID de l'expéditeur, l'ID du destinataire, le montant, le statut et l'horodatage
 
 ### Devise
@@ -67,15 +87,23 @@ Assurez-vous qu'un émulateur Android est en cours d'exécution ou qu'un apparei
 
 ### Option B — Avec Docker (Bonus)
 
-Lancez le backend et MongoDB ensemble avec une seule commande :
+Depuis la racine du dépôt, lancez :
 ```bash
 docker-compose up --build
 ```
+
 Cela démarre :
 - MongoDB sur le port `27017`
 - API Spring Boot sur le port `8080`
 
-Pour arrêter :
+Fichiers ajoutés pour le support Docker :
+- `docker-compose.yml` — définition compose à la racine du dépôt
+- `backend/backend/Dockerfile` — Dockerfile pour construire l'image backend
+
+Le service backend lit la configuration MongoDB depuis des variables d'environnement et utilise la base par défaut `minitransfer`.
+L'application Flutter n'est pas conteneurisée ; exécutez-la localement avec `flutter run`.
+
+Pour arrêter les conteneurs :
 ```bash
 docker-compose down
 ```
