@@ -9,7 +9,7 @@ MiniTransfer allows users to register, log in, check their wallet balance, send 
 ## Technical Choices
 
 ### State Management — Flutter
-Provider was used for state management. It was chosen for its simplicity, its first-party support from the Flutter team, and its suitability for an app of this scale without the overhead of Bloc or Riverpod.
+ValueNotifier and ValueListenableBuilder were used for state management. This approach provides a lightweight, reactive way to handle global states like Theme and Language without the overhead of external libraries.
 
 ### MongoDB Modelling
 The balance is stored directly inside the `users` document (no separate `wallets` collection). This keeps reads simple — fetching a user's balance requires a single document lookup. Balance updates are performed using MongoDB's atomic `$inc` operator via `MongoTemplate` to prevent race conditions and ensure no money is created or lost during concurrent transfers.
@@ -175,76 +175,37 @@ Send money to another user (identified by email or phone number).
 }
 ```
 
-**Error responses:**
-| Case | HTTP Code | Message |
-|------|-----------|---------|
-| Insufficient balance | `400` | `"Insufficient balance"` |
-| Self-transfer | `400` | `"Cannot transfer to yourself"` |
-| Amount ≤ 0 | `400` | `"Amount must be positive"` |
-| Recipient not found | `404` | `"Receiver not found"` |
-
 ---
 
 ### GET /api/transfers/history
 Get the full transaction history of the authenticated user (sent and received), sorted by most recent first.
 
-**Response `200 OK`:**
-```json
-[
-  {
-    "id": "664f...",
-    "senderId": "664f...",
-    "receiverId": "664f...",
-    "amount": 2500,
-    "status": "SUCCESS",
-    "createdAt": "2026-06-25T10:30:00"
-  }
-]
-```
-
----
-
-## Known Limits & Unfinished Features
-
-- Failed transfers (rejected by business rules) are not saved to the `transactions` collection — only successful transfers are persisted. This is a deliberate design choice to keep the history clean, and is documented here for transparency.
-- The app targets Android only; iOS was not tested.
-- No automated tests (unit or integration) were written due to time constraints.
-- Docker support is provided but was not the primary focus.
-
----
-
-## Approximate Time Spent
-
-| Phase | Time |
-|-------|------|
-| Backend (API, security, business logic) | ~3 days |
-| Flutter (screens, navigation, API integration) | ~2 days |
-| Debugging (CORS, balance update, emulator) | ~1 day |
-| README & cleanup | ~2 hours |
-| **Total** | **~6 days** |
-
 ---
 
 ## Project Structure
 
-```
+```text
 minitransfer/
 ├── backend/                  # Spring Boot project
 │   ├── src/main/java/com/minitransfer/backend/
 │   │   ├── config/           # Security & CORS configuration
-│   │   ├── controller/       # REST controllers
-│   │   ├── dto/              # Request/Response DTOs
+│   │   ├── controller/       # REST controllers (Auth, Wallet, Transfer)
+│   │   ├── dto/              # Request/Response Data Transfer Objects
 │   │   ├── model/            # MongoDB documents (User, Transaction)
-│   │   ├── repository/       # Spring Data repositories
+│   │   ├── repository/       # Spring Data MongoDB repositories
 │   │   ├── security/         # JWT filter & utilities
-│   │   └── service/          # Business logic
+│   │   └── service/          # Business logic services
 │   ├── Dockerfile
 │   └── pom.xml
-├── mobile/                   # Flutter project
+├── mobile/                   # Flutter Mobile App
 │   ├── lib/
-│   │   ├── screens/          # Login, Register, Home, Transfer, History
-│   │   ├── services/         # API service (HTTP calls)
-│   │   └── main.dart
+│   │   ├── config/           # App constants and static configuration
+│   │   ├── models/           # Data models (User, Transaction, etc.)
+│   │   ├── screens/          # UI Screens (Welcome, Login, Home, etc.)
+│   │   ├── services/         # API, Language, Theme, and Wallet services
+│   │   ├── storage/          # Local persistence (TokenStorage)
+│   │   ├── widgets/          # Reusable UI components & redesigned Logo
+│   │   └── main.dart         # Entry point with Theme/Locale providers
 │   └── pubspec.yaml
 ├── docker-compose.yml
 └── README.md
@@ -252,4 +213,4 @@ minitransfer/
 
 ---
 
-*Developed by Jorel — TGB Solutions SARL Technical Test — June 2026*
+*Developed by OMBANG Yvan Jorel — TGB Solutions SARL Technical Test — June 2026*
