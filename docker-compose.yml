@@ -1,11 +1,9 @@
-version: '3.9'
-
 services:
   mongodb:
     image: mongo:6
     container_name: minitransfer-mongo
     ports:
-      - "27017:27017"
+      - "27018:27017" # Use host port 27018 when 27017 is already used locally
     volumes:
       - mongo-data:/data/db
     restart: unless-stopped
