@@ -46,6 +46,29 @@ Des jetons JWT sont émis lors de la connexion et validés sur chaque point de t
 
 ---
 
+## Application mobile (Android prioritaire)
+
+Le dépôt contient un client Flutter ciblant d'abord Android (iOS fourni en bonus). Notes d'implémentation et exigences :
+
+- Écrans minimum :
+  - **Inscription**
+  - **Connexion**
+  - **Accueil** : affiche le `balance` courant et un bouton `Transférer`
+  - **Formulaire de transfert** : destinataire (email ou téléphone) + montant + confirmation
+  - **Historique des transactions** : liste des transactions envoyées/reçues, triées par date décroissante
+
+- Gestion d'état : `ValueNotifier` et `ValueListenableBuilder` sont utilisés pour l'état réactif global (thème, langue, portefeuille). Ce choix garde l'application légère et simple pour un projet de petite envergure.
+
+- Stockage du token : les JWT sont stockés de manière sécurisée sur l'appareil. Utiliser `flutter_secure_storage` en production ; `shared_preferences` peut servir de solution de secours pour des démonstrations. Le stockage des tokens se trouve sous `mobile/storage/` dans le code.
+
+- Expérience utilisateur et gestion des erreurs :
+  - Les erreurs API sont présentées aux utilisateurs par des messages conviviaux (snackbars / dialogues).
+  - Des indicateurs de chargement sont affichés pour les opérations réseau (transferts, authentification, récupération du solde).
+  - La validation côté client empêche les montants invalides (≤ 0) et l'auto-transfert avant d'appeler l'API.
+
+- Devise : les montants sont des entiers en FCFA (pas de flottants) et l'interface les affiche formatés.
+
+
 ## Prérequis
 
 | Outil | Version Minimale |
@@ -98,14 +121,29 @@ Cela démarre :
 
 Fichiers ajoutés pour le support Docker :
 - `docker-compose.yml` — définition compose à la racine du dépôt
-- `backend/backend/Dockerfile` — Dockerfile pour construire l'image backend
+- `backend/Dockerfile` — Dockerfile pour construire l'image backend
+- `.env.example` — exemple de variables d'environnement pour le développement local
 
 Le service backend lit la configuration MongoDB depuis des variables d'environnement et utilise la base par défaut `minitransfer`.
+Pour utiliser l'exemple de fichier d'environnement, copiez `.env.example` en `.env` avant d'exécuter Docker.
 L'application Flutter n'est pas conteneurisée ; exécutez-la localement avec `flutter run`.
 
 Pour arrêter les conteneurs :
 ```bash
 docker-compose down
+```
+
+Exemple de `docker-compose.yml` (à titre indicatif) :
+
+```yaml
+services:
+  mongodb:
+    image: mongo:6
+    ports: ["27017:27017"]
+  backend:
+    build: ./backend
+    ports: ["8080:8080"]
+    depends_on: [mongodb]
 ```
 
 ---
@@ -215,6 +253,7 @@ Obtenir l'historique complet des transactions de l'utilisateur authentifié (env
 ```text
 minitransfer/
 ├── backend/                  # Projet Spring Boot
+│   ├── Dockerfile            # Backend container build file
 │   ├── src/main/java/com/minitransfer/backend/
 │   │   ├── config/           # Configuration Sécurité & CORS
 │   │   ├── controller/       # Contrôleurs REST (Auth, Wallet, Transfer)
@@ -242,3 +281,25 @@ minitransfer/
 ---
 
 *Développé par OMBANG Yvan Jorel — Test Technique TGB Solutions SARL — Juin 2026*
+
+---
+
+## Limites connues et fonctionnalités inachevées
+
+- Les transferts échoués pour des raisons métier ne sont pas sauvegardés dans la collection `transactions` — seules les transactions réussies sont persistées. C'était un choix délibéré pour garder l'historique concis, mais cela signifie que certains échecs ne sont pas enregistrés pour l'audit.
+- L'application a été prioritairement testée sur Android ; le support iOS est inclus mais n'a pas été entièrement validé sur matériel réel.
+- Il n'existe pas de suite de tests automatisés complète (unitaires/intégration) pour le backend ou le client mobile, par manque de temps.
+- Des fonctionnalités avancées comme le multi-portefeuilles, un grand livre d'écriture (ledger), des clés d'idempotence pour les appels API, la limitation de débit ou une architecture haute-disponibilité n'ont pas été implémentées et sont hors-scope pour ce test.
+
+L'honnêteté sur les limites est volontaire : la livraison privilégie une surface fonctionnelle petite, documentée et correcte plutôt qu'un grand ensemble de fonctionnalités inachevées.
+
+## Temps approximatif passé
+
+| Phase | Temps |
+|-------|------|
+| Backend (API, sécurité, logique métier) | ~3 jours |
+| Flutter (écrans, navigation, intégration API) | ~2 jours |
+| Débogage (CORS, mise à jour de solde, émulateur) | ~1 jour |
+| README & nettoyage | ~2 heures |
+| **Total** | **~6 jours** |
+
