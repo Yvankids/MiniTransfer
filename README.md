@@ -134,6 +134,14 @@ To stop the containers:
 docker-compose down
 ```
 
+## Demo vidéo
+
+Clique sur l’image ci-dessous pour ouvrir la vidéo de démonstration :
+
+[![Démonstration MiniTransfer](./picture.png)](./20260627-1046-12.2522141.mp4)
+
+---
+
 Example `docker-compose.yml` (illustratif):
 
 ```yaml
