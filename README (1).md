@@ -67,15 +67,19 @@ Make sure an Android emulator is running or a physical device is connected.
 
 ### Option B — With Docker (Bonus)
 
-Launch the backend and MongoDB together in one command:
+From the repository root, run:
 ```bash
 docker-compose up --build
 ```
-This starts:
+
+This composes:
 - MongoDB on port `27017`
 - Spring Boot API on port `8080`
 
-To stop:
+The backend image is built from `backend/backend/Dockerfile`.
+The Flutter mobile app is not containerized, so continue running it locally with `flutter run`.
+
+To stop the containers:
 ```bash
 docker-compose down
 ```
@@ -185,30 +189,51 @@ Get the full transaction history of the authenticated user (sent and received), 
 ## Project Structure
 
 ```text
-minitransfer/
-├── backend/                  # Spring Boot project
-│   ├── src/main/java/com/minitransfer/backend/
-│   │   ├── config/           # Security & CORS configuration
-│   │   ├── controller/       # REST controllers (Auth, Wallet, Transfer)
-│   │   ├── dto/              # Request/Response Data Transfer Objects
-│   │   ├── model/            # MongoDB documents (User, Transaction)
-│   │   ├── repository/       # Spring Data MongoDB repositories
-│   │   ├── security/         # JWT filter & utilities
-│   │   └── service/          # Business logic services
-│   ├── Dockerfile
-│   └── pom.xml
-├── mobile/                   # Flutter Mobile App
+MiniTransfer/
+├── README (1).md             # This file
+├── README_FR.md              # French README
+├── docs/                     # Documentation
+├── backend/                  # Java Spring Boot project wrapper
+│   ├── backend/
+│   │   ├── pom.xml
+│   │   ├── mvnw
+│   │   ├── mvnw.cmd
+│   │   ├── Dockerfile         # Backend container build file
+│   │   ├── src/main/java/com/minitransfer/backend/
+│   │   │   ├── config/
+│   │   │   ├── controller/
+│   │   │   ├── dto/
+│   │   │   ├── model/
+│   │   │   ├── repository/
+│   │   │   ├── security/
+│   │   │   └── service/
+│   │   ├── src/test/
+│   │   └── src/main/resources/
+│   │       └── application.properties
+│   ├── postman/
+│   │   ├── collections/
+│   │   ├── environments/
+│   │   ├── flows/
+│   │   ├── globals/
+│   │   ├── mocks/
+│   │   └── specs/
+│   └── target/
+├── mobile/                   # Flutter app
+│   ├── pubspec.yaml
+│   ├── analysis_options.yaml
+│   ├── devtools_options.yaml
+│   ├── README.md
 │   ├── lib/
-│   │   ├── config/           # App constants and static configuration
-│   │   ├── models/           # Data models (User, Transaction, etc.)
-│   │   ├── screens/          # UI Screens (Welcome, Login, Home, etc.)
-│   │   ├── services/         # API, Language, Theme, and Wallet services
-│   │   ├── storage/          # Local persistence (TokenStorage)
-│   │   ├── widgets/          # Reusable UI components & redesigned Logo
-│   │   └── main.dart         # Entry point with Theme/Locale providers
-│   └── pubspec.yaml
-├── docker-compose.yml
-└── README.md
+│   ├── android/
+│   ├── ios/
+│   ├── web/
+│   ├── windows/
+│   ├── macos/
+│   ├── linux/
+│   ├── build/
+│   └── test/
+├── docker-compose.yml        # Compose for backend + MongoDB
+└── .gitignore
 ```
 
 ---
