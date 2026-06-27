@@ -43,6 +43,15 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    // Use provided colors or fallback to theme-aware defaults
+    final effectiveLabelColor = widget.labelColor ?? theme.colorScheme.onSurface.withOpacity(0.6);
+    final effectiveFillColor = widget.fillColor ?? (isDark ? const Color(0xFF181926) : const Color(0xFFF0F1F7));
+    final effectiveTextColor = widget.textColor ?? theme.colorScheme.onSurface;
+    final effectiveIconColor = widget.iconColor ?? theme.primaryColor;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -51,7 +60,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.bold,
-            color: widget.labelColor ?? const Color(0xFF333333),
+            color: effectiveLabelColor,
             letterSpacing: 1.2,
           ),
         ),
@@ -60,33 +69,33 @@ class _CustomTextFieldState extends State<CustomTextField> {
           controller: widget.controller,
           obscureText: _obscureText,
           keyboardType: widget.keyboardType,
-          style: TextStyle(color: widget.textColor ?? Colors.black),
+          style: TextStyle(color: effectiveTextColor),
           decoration: InputDecoration(
             hintText: widget.hint,
-            hintStyle: TextStyle(color: (widget.textColor ?? Colors.black).withValues(alpha: 0.4)),
+            hintStyle: TextStyle(color: effectiveTextColor.withOpacity(0.3)),
             prefixIcon: widget.prefixIcon != null 
-                ? Icon(widget.prefixIcon, color: widget.iconColor ?? const Color(0xFF6C63FF)) 
+                ? Icon(widget.prefixIcon, color: effectiveIconColor) 
                 : null,
             prefix: widget.prefix,
             suffixIcon: widget.isPassword
                 ? IconButton(
                     icon: Icon(
                       _obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                      color: widget.iconColor?.withValues(alpha: 0.5) ?? const Color(0xFFAAAAAA),
+                      color: effectiveTextColor.withOpacity(0.4),
                       size: 20,
                     ),
                     onPressed: () => setState(() => _obscureText = !_obscureText),
                   )
                 : null,
             filled: true,
-            fillColor: widget.fillColor ?? const Color(0xFFF5F5F5),
+            fillColor: effectiveFillColor,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide.none,
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: widget.iconColor ?? const Color(0xFF6C63FF), width: 1.5),
+              borderSide: BorderSide(color: effectiveIconColor, width: 1.5),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
           ),
